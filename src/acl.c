@@ -22,11 +22,11 @@ char *get_permissions(const char *path, size_t *length) {
 
     char *xattr = xattrs;
     while (xattr < (xattrs + size)) {
-        if (strncmp(xattr, ACL_PREFIX, ACL_PREFIX_LENGTH) == 0 && strlen(xattr) == PK_BS32_LENGTH) {
-            permissions = realloc(permissions, *length + PK_BS32_LENGTH + 1);
+        if (strncmp(xattr, ACL_PREFIX, ACL_PREFIX_LENGTH) == 0 && strlen(xattr) == PK_BS32_LENGTH-1) {
+            permissions = realloc(permissions, *length + PK_BS32_LENGTH);
             memcpy(permissions + *length, xattr, PK_BS32_LENGTH);
             getxattr(path, xattr, (permissions + *length + PK_BS32_LENGTH), sizeof(char));
-            *length += PK_BS32_LENGTH + 2;
+            *length += PK_BS32_LENGTH + 1;
         }
         xattr += strlen(xattr) + 1;
     }
@@ -35,9 +35,8 @@ char *get_permissions(const char *path, size_t *length) {
 
 
 char get_permission(const char *path, const char pk_bs32[PK_BS32_LENGTH]) {
-    char acl_key[ACL_PREFIX_LENGTH + PK_BS32_LENGTH + 1] = {ACL_PREFIX};
+    char acl_key[ACL_PREFIX_LENGTH + PK_BS32_LENGTH] = {ACL_PREFIX};
     memcpy(acl_key + ACL_PREFIX_LENGTH, pk_bs32, PK_BS32_LENGTH);
-    acl_key[ACL_PREFIX_LENGTH + PK_BS32_LENGTH] = '\0';
 
     // Get the total size of attribute keys.
     ssize_t size = listxattr(path, NULL, 0);
@@ -86,9 +85,8 @@ char get_permission(const char *path, const char pk_bs32[PK_BS32_LENGTH]) {
 
 
 int set_permission(const char *path, char pk_bs32[PK_BS32_LENGTH], char permission) {
-    char acl_key[ACL_PREFIX_LENGTH + PK_BS32_LENGTH + 1] = {ACL_PREFIX};
+    char acl_key[ACL_PREFIX_LENGTH + PK_BS32_LENGTH] = {ACL_PREFIX};
     memcpy(acl_key + ACL_PREFIX_LENGTH, pk_bs32, PK_BS32_LENGTH);
-    acl_key[ACL_PREFIX_LENGTH + PK_BS32_LENGTH] = '\0';
     if (setxattr(path, acl_key, (void *)&permission, sizeof(char), 0) == -1)
         return -errno;
     return 0;
@@ -120,9 +118,8 @@ int del_permissions(const char *path) {
 
 int del_permission(const char *path, const char pk_bs32[PK_BS32_LENGTH]) {
     // Build ACL key with the pk.
-    char acl_key[ACL_PREFIX_LENGTH + PK_BS32_LENGTH + 1] = {ACL_PREFIX};
+    char acl_key[ACL_PREFIX_LENGTH + PK_BS32_LENGTH] = {ACL_PREFIX};
     memcpy(acl_key + ACL_PREFIX_LENGTH, pk_bs32, PK_BS32_LENGTH);
-    acl_key[ACL_PREFIX_LENGTH + PK_BS32_LENGTH] = '\0';
 
     ssize_t size = listxattr(path, NULL, 0);
     if (size < 0)
