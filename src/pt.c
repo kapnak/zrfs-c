@@ -271,13 +271,7 @@ int z_mount(char *ip, int port,
     ptfs.rootdir = ".";
     umask(0);
 
-    if (__CYGWIN__) {
-        char *argv[] = {"zrfs", path, "-f", "-o", "uid=-1,gid=-1", NULL}; //"-f", "-d", NULL}; // allow_other,defer_permissions,umask=000
-        int argc = 5;
-        return fuse_main(argc, argv, &ptfs_ops, &ptfs);
-    } else {
-        char *argv[] = {"zrfs", path, "-f", NULL}; //"-f", "-d", NULL}; // allow_other,defer_permissions,umask=000
-        int argc = 3;
-        return fuse_main(argc, argv, &ptfs_ops, &ptfs);
-    }
+    char *argv[] = {"zrfs", path, "-f", "-o", "uid=-1,gid=-1", NULL}; //-d allow_other,defer_permissions,umask=000
+    int argc = 5;
+    return fuse_main(argc, argv, &ptfs_ops, &ptfs);
 }
