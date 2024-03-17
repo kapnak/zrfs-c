@@ -2,6 +2,8 @@ import os
 import time
 import signal
 import subprocess
+from sys import platform as _platform
+
 
 processes = []
 TEST_DIR = f'/tmp/zrfs-test-{round(time.time())}'
@@ -112,14 +114,17 @@ content = 'abcd' * 10000000
 server_pk = ''
 client_pk = ''
 
+# Prepare environment
 os.system("kill -9 $(ps aux | grep -e zrfs | awk '{ print $3 }') > /dev/null 2>&1")
 os.system('make clean')
 os.system(f'rm -rf /tmp/zrfs-test-*')
 os.system(f'mkdir -p {TEST_DIR}/data')
-
+if _platform != 'cygwin':
+    os.system(f'mkdir -p {TEST_DIR}/mnt')
 with open(f'{TEST_DIR}/data/testfile.txt', 'w') as f:
     f.write(content)
 
+# Execute tests
 test = Test(TEST_DIR)
 test.execute('Build CLI', 'make build-cli', wd='')
 test.execute('Create server key', f'{ZRFS} key server.sk', validate_server_key)
@@ -134,6 +139,7 @@ test.execute('Edit permission', f'{ZRFS} acl add data {client_pk} 3 && {ZRFS} ac
 test.execute('Write', f'echo "{client_pk}" > mnt/testfile2.txt', validate_write)
 test.execute('Deleting permissions', f'{ZRFS} acl del data && {ZRFS} acl list data', validate_del_permission)
 
+# Exit
 exit_gracefully(0)
 
 # TODO : Test delete one ACL.
