@@ -20,7 +20,7 @@ jobs:
           git clone https://github.com/kapnak/zprotocol-c
           cd zprotocol-c
           make build-shared
-          make install
+          sudo make install
 
       - name: Tests
         run: python test.py
