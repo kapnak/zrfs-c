@@ -14,6 +14,10 @@
 #define MAX_READ_SIZE 1000000
 #define MAX_WRITE_SIZE 1000000
 
+#ifndef __CYGWIN__
+    #define __CYGWIN__ 0
+#endif
+
 #if 1
     #define log(fmt, ...) \
     printf("%s:%d:%s(): " fmt, __FILE__, __LINE__, __func__, ##__VA_ARGS__);
@@ -272,7 +276,13 @@ int z_mount(char *ip, int port,
     ptfs.rootdir = ".";
     umask(0);
 
-    char *argv[] = {"zrfs", path, "-f", "-o", "uid=-1,gid=-1", NULL}; //-d allow_other,defer_permissions,umask=000
-    int argc = 5;
-    return fuse_main(argc, argv, &ptfs_ops, &ptfs);
+    if (__CYGWIN__) {
+        char *argv[] = {"zrfs", path, "-f", "-o", "uid=-1,gid=-1", NULL}; //-d allow_other,defer_permissions,umask=000
+        int argc = 5;
+        return fuse_main(argc, argv, &ptfs_ops, &ptfs);
+    } else {
+        char *argv[] = {"zrfs", path, "-f", NULL};
+        int argc = 3;
+        return fuse_main(argc, argv, &ptfs_ops, &ptfs);
+    }
 }

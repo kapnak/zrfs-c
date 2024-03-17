@@ -8,7 +8,7 @@
 
 #define TIMEOUT 3
 
-#ifdef __CYGWIN__
+#ifndef __CYGWIN__
     #define __CYGWIN__ 0
 #endif
 
