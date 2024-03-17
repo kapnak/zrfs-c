@@ -1,0 +1,26 @@
+name: Tests
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install libsodium & libfuse
+        run: sudo apt install -y libsodium-dev pkg-config libfuse3-dev
+
+      - name: Install ZProtocol
+        run: |
+          git clone https://github.com/kapnak/zprotocol-c
+          cd zprotocol-c
+          make build-shared
+          make install
+
+      - name: Tests
+        run: python test.py
