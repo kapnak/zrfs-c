@@ -98,8 +98,13 @@ def validate_write_denied(output):
     return 'Permission denied' in output
 
 
+def validate_write_server_key(output):
+    with open(f'{TEST_DIR}/data/testfile3.txt', 'r') as f:
+        return f.read() == client_pk + '\n'
+
+
 def validate_write(output):
-    with open(f'{TEST_DIR}/data/testfile2.txt', 'r') as f:
+    with open(f'{TEST_DIR}/data/testfile4.txt', 'r') as f:
         return f.read() == client_pk + '\n'
 
 
@@ -132,11 +137,13 @@ test.execute('Create client key', f'{ZRFS} key client.sk', validate_client_key)
 test.execute('Launch server', f'cd data && {ZRFS} host 127.0.0.1 6339 ../server.sk', noreturn=True)
 test.execute('Set permission', f'{ZRFS} acl add data {client_pk} 2 && {ZRFS} acl list data', validate_acl_2)
 test.execute('Mount FS', f'{ZRFS} mount 127.0.0.1 6339 mnt {server_pk} client.sk', noreturn=True)
+test.execute('Mount FS with server key', f'{ZRFS} mount 127.0.0.1 6339 mnt2 {server_pk} server.sk', noreturn=True)
 test.execute('Read dir', f'ls mnt', validate_readdir)
 test.execute('Read', 'cat mnt/testfile.txt', validate_read)
 test.execute('Write (denied)', 'echo "test" > mnt/testfile2.txt', validate_write_denied, should_failed=True)
+test.execute('Write (With server key)', f'echo "{client_pk}" > mnt2/testfile3.txt', validate_write_server_key)
 test.execute('Edit permission', f'{ZRFS} acl add data {client_pk} 3 && {ZRFS} acl list data', validate_acl_3)
-test.execute('Write', f'echo "{client_pk}" > mnt/testfile2.txt', validate_write)
+test.execute('Write', f'echo "{client_pk}" > mnt/testfile4.txt', validate_write)
 test.execute('Deleting permissions', f'{ZRFS} acl del data && {ZRFS} acl list data', validate_del_permission)
 
 # Exit

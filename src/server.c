@@ -13,7 +13,9 @@
 
 
 #define CHECK_PERMISSION(path, permission)                      \
-    if (get_permission(path, peer->attribute) < permission) {   \
+    if (memcmp(peer->pk, peer->local_peer->pk, ED25519_PK_LENGTH) != 0 &&          \
+        get_permission(path, peer->attribute) < permission) {   \
+                                                                \
         unsigned char reply_err[8];                             \
         *(int64_t *)(reply_err) = EACCES;                       \
         z_reply(peer, reply_err, 8, message->id);               \

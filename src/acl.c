@@ -102,7 +102,6 @@ int del_permissions(const char *path) {
         if (listxattr(path, xattrs, size) < 0)
             return -errno;
 
-        // Check if the pk_bs32 is in the attribute keys.
         char *xattr = xattrs;
         char *end = xattrs + size;
         char def = 0;
