@@ -125,7 +125,7 @@ os.system('make clean')
 os.system(f'rm -rf /tmp/zrfs-test-*')
 os.system(f'mkdir -p {TEST_DIR}/data')
 if _platform != 'cygwin':
-    os.system(f'mkdir -p {TEST_DIR}/mnt')
+    os.system(f'mkdir -p {TEST_DIR}/mnt {TEST_DIR}/mnt2')
 with open(f'{TEST_DIR}/data/testfile.txt', 'w') as f:
     f.write(content)
 
