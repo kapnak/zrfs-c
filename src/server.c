@@ -202,7 +202,7 @@ void message_listener(RemotePeer *peer, Message *message) {
 
             int fd = message->content[0] == REQ_CREATE ?
                      open(REQ_CREATE_PATH(message->content), REQ_CREATE_FLAG(message->content) | O_CREAT, 0777):
-                     open(REQ_OPEN_PATH(message->content), REQ_OPEN_FLAG(message->content));
+                     open(REQ_OPEN_PATH(message->content), REQ_OPEN_FLAG(message->content), 0777);
             if (fd == -1)
                 REP_CREATE_ERR(reply) = errno;
             else {
