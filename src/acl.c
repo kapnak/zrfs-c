@@ -72,8 +72,6 @@ char get_permission(const char *path, const char pk_bs32[PK_BS32_LENGTH]) {
         return ACL_NOTHING;
     if ((path[0] == '/' || path[0] == '.') && path[1] == '\0')
         return ACL_NOTHING;
-    if (strchr(path, '/') == NULL && strchr(path, '\\') == NULL)
-        return ACL_NOTHING;
 
     // Get the parent directory permission and return it.
     char *pathdup = strdup(path);
