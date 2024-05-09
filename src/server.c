@@ -176,6 +176,7 @@ void message_listener(RemotePeer *peer, Message *message) {
 
         case REQ_RENAME: {
             CHECK_PERMISSION(REQ_RENAME_FROM(message->content), ACL_WRITE)
+            CHECK_PERMISSION(REQ_RENAME_TO(message->content), ACL_WRITE)
             unsigned char reply[REP_RENAME_LENGTH];
             REP_RENAME_ERR(reply) =
                     rename(REQ_RENAME_FROM(message->content), REQ_RENAME_TO(message->content)) == -1 ? errno : 0;
