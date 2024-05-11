@@ -235,10 +235,29 @@ void message_listener(RemotePeer *peer, Message *message) {
                 break;
             }
             unsigned char reply[REP_WRITE_LENGTH];
-            ssize_t size = pwrite(REQ_WRITE_FH(message->content),
-                                  REQ_WRITE_BUF(message->content),
-                                  REQ_WRITE_SIZE(message->content),
-                                  REQ_WRITE_OFFSET(message->content));
+
+            /*
+             * Cygwin implement the correct POSIX version of `pwrite`, however
+             * ZRFS implement linux bug (https://linux.die.net/man/2/pwrite) as
+             * a feature.
+             * Here for Cygwin we use `write` instead to ignore offset when the
+             * file is open with `O_APPEND` flag.
+             */
+            ssize_t size;
+#ifdef __CYGWIN__
+            if (fcntl(REQ_WRITE_FH(message->content), F_GETFL) & O_APPEND) {
+                size = write(REQ_WRITE_FH(message->content),
+                             REQ_WRITE_BUF(message->content),
+                             REQ_WRITE_SIZE(message->content));
+            } else {
+#endif
+                size = pwrite(REQ_WRITE_FH(message->content),
+                              REQ_WRITE_BUF(message->content),
+                              REQ_WRITE_SIZE(message->content),
+                              REQ_WRITE_OFFSET(message->content));
+#ifdef __CYGWIN__
+            }
+#endif
 
             REP_WRITE_ERR(reply) = size == -1 ? -errno : size;  // TODO : Reverse errno compared to the others :/ that's bad.
             z_reply(peer, reply, REP_WRITE_LENGTH, message->id);
