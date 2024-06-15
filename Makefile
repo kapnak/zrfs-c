@@ -12,6 +12,21 @@ build-shared:
 	cp build/libzrfs.so build/lib/libzrfs.so
 	cp src/zrfs.h build/include/zrfs.h
 
+build-static:
+	mkdir -p build
+	gcc -c -fpic src/zrfs.c -o build/zrfs.o
+	gcc -c -fpic src/acl.c -o build/zrfs.o
+	ar rs build/libzrfs.a build/*.o
+	rm -f build/*.o
+
+	mkdir -p include lib
+	cp build/libzrfs.a build/lib/
+	cp src/zrfs.h build/include/
+
+install-static:
+	cp build/libzrfs.a /usr/lib/
+	cp build/include/zrfs.h /usr/include/
+
 build-cli:
 	mkdir -p build
 	gcc src/* -o build/zrfs -lzprotocol -lsodium -lpthread `pkg-config fuse3 --cflags --libs`
@@ -25,6 +40,7 @@ install-cli:
 
 remove:
 	rm -f /usr/lib/libzrfs.so
+	rm -f /usr/lib/libzrfs.a
 	rm -f /usr/include/zrfs.h
 
 clean:
