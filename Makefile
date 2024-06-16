@@ -4,7 +4,7 @@ build:
 build-shared:
 	mkdir -p build
 	gcc -c -fpic src/zrfs.c -o build/zrfs.o
-	gcc -c -fpic src/acl.c -o build/zrfs.o
+	gcc -c -fpic src/acl.c -o build/acl.o
 	gcc -shared -o build/libzrfs.so build/*.o -lzprotocol
 	rm -f build/*.o
 
@@ -14,12 +14,12 @@ build-shared:
 
 build-static:
 	mkdir -p build
-	gcc -c -fpic src/zrfs.c -o build/zrfs.o
-	gcc -c -fpic src/acl.c -o build/zrfs.o
+	gcc -c src/zrfs.c -o build/zrfs.o
+	gcc -c src/acl.c -o build/acl.o
 	ar rs build/libzrfs.a build/*.o
 	rm -f build/*.o
 
-	mkdir -p include lib
+	mkdir -p build/include build/lib
 	cp build/libzrfs.a build/lib/
 	cp src/zrfs.h build/include/
 
