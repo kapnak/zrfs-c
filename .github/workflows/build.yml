@@ -1,0 +1,24 @@
+name: Builds
+on: [push]
+jobs:
+  Build-Window-Executable:
+    runs-on: windows-latest
+    steps:
+      - run: git config --global core.autocrlf input
+      - uses: actions/checkout@v2
+
+      - name: Install Cygwin and dependencies
+        uses: cygwin/cygwin-install-action@master
+        with:
+          packages: 'gcc-g++ make pkg-config libsodium-debuginfo libsodium-devel libsodium23 cygfuse'
+
+      - name: Install ZProtocol from sources
+        run: |
+          git clone https://github.com/kapnak/zprotocol-c.git
+          bash --login -c 'cd $GITHUB_WORKSPACE/zprotocol-c; make build-shared && make install'
+      
+      - name: Build executable
+        run: bash --login -c 'cd $GITHUB_WORKSPACE; make build-cli'
+
+      - name: Test
+        run: build/zrfs.exe
