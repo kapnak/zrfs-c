@@ -1,5 +1,9 @@
 name: Builds
-on: [push]
+on:
+  release:
+    type: [published]
+permissions:
+  contents: write
 jobs:
   Build-Window-Executable:
     runs-on: windows-latest
@@ -18,7 +22,16 @@ jobs:
           bash --login -c 'cd $GITHUB_WORKSPACE/zprotocol-c; make build-shared && make install'
       
       - name: Build executable
-        run: bash --login -c 'cd $GITHUB_WORKSPACE; make build-cli'
+        run: |
+          bash --login -c 'cd $GITHUB_WORKSPACE; make build-cli'
+          cp dll/* build/*
 
       - name: Test
         run: build/zrfs.exe
+
+      - name: Package & add to release
+        run: |
+          tar -a -c -f zrfs-win-x64.zip build/*
+          gh release upload ${{github.event.release.tag_name}} zrfs-win-x64.zip
+        env:
+          GITHUB_TOKEN: ${{ github.TOKEN }}
