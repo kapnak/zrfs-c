@@ -23,8 +23,7 @@ jobs:
       
       - name: Build executable
         run: |
-          bash --login -c 'cd $GITHUB_WORKSPACE; make build-cli'
-          cp dll/* build/*
+          bash --login -c 'cd $GITHUB_WORKSPACE; make build-cli; cp dll/* build/*'
 
       - name: Test
         run: build/zrfs.exe
