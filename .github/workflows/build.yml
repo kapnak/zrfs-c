@@ -30,5 +30,7 @@ jobs:
           ren build zrfs
           tar -a -c -f zrfs-win-x64.zip zrfs/*
           gh release upload ${{github.event.release.tag_name}} zrfs-win-x64.zip
+        shell:
+          cmd
         env:
           GITHUB_TOKEN: ${{ github.TOKEN }}
