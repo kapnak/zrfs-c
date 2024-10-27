@@ -1,7 +1,7 @@
 name: Builds
 on:
   release:
-    type: [published]
+    types: [published]
 permissions:
   contents: write
 jobs:
