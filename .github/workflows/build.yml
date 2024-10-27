@@ -19,7 +19,7 @@ jobs:
       - name: Install ZProtocol from sources
         run: |
           git clone https://github.com/kapnak/zprotocol-c.git
-          bash --login -c 'cd $GITHUB_WORKSPACE/zprotocol-c; make build-shared && make install'
+          bash --login -c 'cd $GITHUB_WORKSPACE/zprotocol-c; make build-static && make install-static'
       
       - name: Build executable
         run: |
