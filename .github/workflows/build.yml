@@ -1,0 +1,34 @@
+name: Builds
+on:
+  release:
+    types: [published]
+permissions:
+  contents: write
+jobs:
+  Build-Window-Executable:
+    runs-on: windows-latest
+    steps:
+      - run: git config --global core.autocrlf input
+      - uses: actions/checkout@v2
+
+      - name: Install Cygwin and dependencies
+        uses: cygwin/cygwin-install-action@master
+        with:
+          packages: 'gcc-g++ make pkg-config libsodium-debuginfo libsodium-devel libsodium23 cygfuse'
+
+      - name: Install ZProtocol from sources
+        run: |
+          git clone https://github.com/kapnak/zprotocol-c.git
+          bash --login -c 'cd $GITHUB_WORKSPACE/zprotocol-c; make build-static && make install-static'
+      
+      - name: Build executable
+        run: |
+          bash --login -c 'cd $GITHUB_WORKSPACE; make build-cli; cp dll/* build/'
+
+      - name: Package & add to release
+        run: |
+          ren build zrfs
+          Compress-Archive -Path zrfs/* -Destination zrfs-win-x64.zip
+          gh release upload ${{github.event.release.tag_name}} zrfs-win-x64.zip
+        env:
+          GITHUB_TOKEN: ${{ github.TOKEN }}
