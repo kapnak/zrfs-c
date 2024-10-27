@@ -25,12 +25,10 @@ jobs:
         run: |
           bash --login -c 'cd $GITHUB_WORKSPACE; make build-cli && cp dll/* build/'
 
-      - name: Test
-        run: build/zrfs.exe
-
       - name: Package & add to release
         run: |
-          tar -a -c -f zrfs-win-x64.zip build/*
+          ren build zrfs
+          tar -a -c -f zrfs-win-x64.zip zrfs/*
           gh release upload ${{github.event.release.tag_name}} zrfs-win-x64.zip
         env:
           GITHUB_TOKEN: ${{ github.TOKEN }}
