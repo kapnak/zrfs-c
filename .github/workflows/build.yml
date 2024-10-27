@@ -28,9 +28,7 @@ jobs:
       - name: Package & add to release
         run: |
           ren build zrfs
-          tar -a -c -f zrfs-win-x64.zip zrfs/*
+          Compress-Archive -Path zrfs/* -Destination zrfs-win-x64.zip
           gh release upload ${{github.event.release.tag_name}} zrfs-win-x64.zip
-        shell:
-          cmd
         env:
           GITHUB_TOKEN: ${{ github.TOKEN }}
